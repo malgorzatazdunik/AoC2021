@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-df = pd.read_csv('input.txt', dtype=str, delimiter = "\t", header=None)
+df = pd.read_csv('data/day3.txt', dtype=str, delimiter = "\t", header=None)
 
 _ll = [[x for x in df.iloc[i][0]] for i in range(df.shape[0])]
 _ll = np.array(_ll)

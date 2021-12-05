@@ -1,10 +1,4 @@
-import pandas as pd
-import numpy as np
-
-# df = pd.read_csv('input.txt', dtype=str, delimiter="\t", header=None)
-
-
-file = open("input.txt")
+file = open("data/day5.txt")
 file_contents = file.read()
 contents_split = file_contents.splitlines()
 

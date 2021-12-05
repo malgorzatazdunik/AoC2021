@@ -1,6 +1,6 @@
 import numpy as np
 
-file = open("input.txt")
+file = open("data/day4.txt")
 file_contents = file.read()
 contents_split = file_contents.splitlines()
 
