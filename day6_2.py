@@ -30,7 +30,6 @@ def number_of_fish(start_arr, num_of_days):
     return sum_of_fish
 
 def test_number_of_fish():
-    map = buckets()
     start_arr = [3,4,3,1,2]
     num_of_days = 18
 
