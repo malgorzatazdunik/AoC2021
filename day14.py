@@ -35,31 +35,62 @@ def find_pattern_indices(pattern, string):
     return indices
 
 def puzzle(polymer, instructions, rounds):
+
+    pairs_in_polymer = {}
+    for i in range(len(polymer)-1):
+        if polymer[i:i+2] in pairs_in_polymer.keys():
+            pairs_in_polymer[polymer[i:i+2]] += 1
+        else:
+            pairs_in_polymer[polymer[i:i + 2]] = 1
+
+    counts = {}
+    for letter in set(polymer):
+        counts[letter] = polymer.count(letter)
+
     for round in range(rounds):
-        rules = {}
+        pairs_to_add = {}
+        pairs_to_delete = {}
+
         for ins in instructions:
             pair = ins.split(' -> ')[0]
             insert = ins.split(' -> ')[1]
-            if pair in polymer:
-                rules[pair] = insert
+            if pair in pairs_in_polymer.keys():
+                new_pair_1 = pair[0] + insert
+                new_pair_2 = insert + pair[1]
+                if (new_pair_1, new_pair_2) in pairs_to_add.keys():
+                    pairs_to_add[(new_pair_1, new_pair_2)] += pairs_in_polymer[pair]
+                else:
+                    pairs_to_add[(new_pair_1, new_pair_2)] = pairs_in_polymer[pair]
 
-        indices = []
-        pairs = []
-        for pair in rules.keys():
-            _indices = find_pattern_indices(pair, polymer)
-            indices.extend(_indices)
-            pairs.extend([pair for i in _indices])
+                if pair in pairs_to_delete.keys():
+                    pairs_to_delete[pair] += pairs_in_polymer[pair]
+                else:
+                    pairs_to_delete[pair] = pairs_in_polymer[pair]
 
-        for i in range(len(indices)):
-            pair = pairs[i]
-            polymer = insert_to_polymer(polymer, indices[i], rules[pair])
-            for index in range(len(indices)):
-                if indices[index] > indices[i]:
-                    indices[index] += 1
 
-    _most_common = Counter(polymer).most_common()
-    most_common_count = max([x[1] for x in _most_common])
-    least_common_count = min([x[1] for x in _most_common])
+        for new_pair, old_pair in zip(pairs_to_add.keys(), pairs_to_delete):
+            new_pair_1 = new_pair[0]
+            new_pair_2 = new_pair[1]
+            insert = new_pair_1[1]
+            if new_pair_1 in pairs_in_polymer.keys():
+                pairs_in_polymer[new_pair_1] += pairs_to_delete[old_pair]
+            else:
+                pairs_in_polymer[new_pair_1] = pairs_to_delete[old_pair]
+
+            if new_pair_2 in pairs_in_polymer.keys():
+                pairs_in_polymer[new_pair_2] += pairs_to_delete[old_pair]
+            else:
+                pairs_in_polymer[new_pair_2] = pairs_to_delete[old_pair]
+
+            if insert in counts.keys():
+                counts[insert] += pairs_to_delete[old_pair]
+            else:
+                counts[insert] = pairs_to_delete[old_pair]
+
+            pairs_in_polymer[old_pair] -= pairs_to_delete[old_pair]
+
+    most_common_count = max(counts.values())
+    least_common_count = min(counts.values())
     ans = most_common_count - least_common_count
     return ans
 
@@ -69,4 +100,4 @@ file = open("data/day14.txt")
 file_contents = file.read()
 contents_split = file_contents.splitlines()
 polymer, instructions = prepare_data(contents_split)
-print(puzzle(polymer, instructions, 10))
+print(puzzle(polymer, instructions, 40))
